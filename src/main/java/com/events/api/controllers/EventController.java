@@ -122,6 +122,7 @@ public class EventController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteAllEvents() {
         try {
             eventRepository.deleteAll();
