@@ -81,14 +81,8 @@ public class EventController {
                 Event _event = eventData.get();
                 _event.setName(event.getName());
                 _event.setDate(event.getDate());
-                Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                if (user.isPresent()) {
-                    if (!user.get().equals(eventData.get().getUser())) {
-                        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-                    }
-                } else {
-                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-                }
+                ResponseEntity<Event> UNAUTHORIZED = getEventResponseEntity(eventData);
+                if (UNAUTHORIZED != null) return UNAUTHORIZED;
                 return new ResponseEntity<>(eventRepository.save(_event), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,20 +92,25 @@ public class EventController {
         }
     }
 
+    private ResponseEntity<Event> getEventResponseEntity(Optional<Event> eventData) {
+        Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (eventData.isPresent() && user.isPresent()) {
+            if (!user.get().equals(eventData.get().getUser())) {
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return null;
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteEvent(@PathVariable("id") String id) {
         try {
             Optional<Event> eventData = eventRepository.findById(id);
 
             if (eventData.isPresent()) {
-                Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                if (user.isPresent()) {
-                    if (!user.get().equals(eventData.get().getUser())) {
-                        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-                    }
-                } else {
-                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-                }
+                ResponseEntity<Event> UNAUTHORIZED = getEventResponseEntity(eventData);
                 eventRepository.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
@@ -123,7 +122,6 @@ public class EventController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteAllEvents() {
         try {
             eventRepository.deleteAll();
