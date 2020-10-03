@@ -58,6 +58,7 @@ public class EventController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) {
         try {
             Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -73,6 +74,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Event> updateEvent(@PathVariable("id") String id, @Valid @RequestBody Event event) {
         try {
             Optional<Event> eventData = eventRepository.findById(id);
@@ -105,6 +107,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteEvent(@PathVariable("id") String id) {
         try {
             Optional<Event> eventData = eventRepository.findById(id);
