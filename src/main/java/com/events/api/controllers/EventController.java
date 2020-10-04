@@ -83,27 +83,19 @@ public class EventController {
                 Event _event = eventData.get();
                 _event.setName(event.getName());
                 _event.setDate(event.getDate());
-                ResponseEntity<Event> UNAUTHORIZED = getEventResponseEntity(eventData);
-                if (UNAUTHORIZED != null) return UNAUTHORIZED;
-                return new ResponseEntity<>(eventRepository.save(_event), HttpStatus.OK);
+                Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if (user.isPresent()) {
+                    _event.setUser(user.get());
+                    return new ResponseEntity<>(eventRepository.save(_event), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                }
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private ResponseEntity<Event> getEventResponseEntity(Optional<Event> eventData) {
-        Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (eventData.isPresent() && user.isPresent()) {
-            if (!user.get().equals(eventData.get().getUser())) {
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-            }
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return null;
     }
 
     @DeleteMapping("/{id}")
@@ -113,7 +105,6 @@ public class EventController {
             Optional<Event> eventData = eventRepository.findById(id);
 
             if (eventData.isPresent()) {
-                ResponseEntity<Event> UNAUTHORIZED = getEventResponseEntity(eventData);
                 eventRepository.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
