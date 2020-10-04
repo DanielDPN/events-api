@@ -38,7 +38,7 @@ public class EventController {
             if (name == null)
                 events.addAll(eventRepository.findAll());
             else
-                events.addAll(eventRepository.findByNameContaining(name));
+                events.addAll(eventRepository.findByNameContainingIgnoreCase(name));
 
             if (events.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

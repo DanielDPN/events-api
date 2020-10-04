@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface EventRepository extends MongoRepository<Event, String> {
 
-    List<Event> findByNameContaining(String name);
+    List<Event> findByNameContainingIgnoreCase(String name);
 
 }
