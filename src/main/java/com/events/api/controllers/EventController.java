@@ -4,6 +4,9 @@ import com.events.api.models.Event;
 import com.events.api.models.User;
 import com.events.api.repository.EventRepository;
 import com.events.api.repository.UserRepository;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,12 @@ public class EventController {
         this.userRepository = userRepository;
     }
 
+    @ApiOperation(value = "Retorna uma lista de eventos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna a lista de eventos"),
+            @ApiResponse(code = 204, message = "Lista de eventos vazia"),
+            @ApiResponse(code = 500, message = "Foi gerada uma exceção")
+    })
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents(@RequestParam(required = false) String name) {
         try {
@@ -50,6 +59,11 @@ public class EventController {
         }
     }
 
+    @ApiOperation(value = "Retorna um evento")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna um evento"),
+            @ApiResponse(code = 404, message = "Evento não encontrado")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable("id") String id) {
         Optional<Event> eventData = eventRepository.findById(id);
@@ -57,6 +71,12 @@ public class EventController {
         return eventData.map(event -> new ResponseEntity<>(event, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @ApiOperation(value = "Retorna o novo evento registrado")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Retorna um evento"),
+            @ApiResponse(code = 400, message = "Falta o parâmetro 'user'"),
+            @ApiResponse(code = 500, message = "Foi gerada uma exceção")
+    })
     @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) {
@@ -73,6 +93,13 @@ public class EventController {
         }
     }
 
+    @ApiOperation(value = "Retorna o evento atualizado")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Retorna um evento"),
+            @ApiResponse(code = 400, message = "Falta o parâmetro 'user'"),
+            @ApiResponse(code = 404, message = "Evento não encontrado"),
+            @ApiResponse(code = 500, message = "Foi gerada uma exceção")
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Event> updateEvent(@PathVariable("id") String id, @Valid @RequestBody Event event) {
@@ -98,6 +125,12 @@ public class EventController {
         }
     }
 
+    @ApiOperation(value = "Remove o evento")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Remove o evento"),
+            @ApiResponse(code = 404, message = "Evento não encontrado"),
+            @ApiResponse(code = 500, message = "Foi gerada uma exceção")
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteEvent(@PathVariable("id") String id) {
@@ -115,6 +148,11 @@ public class EventController {
         }
     }
 
+    @ApiOperation(value = "Remove todos os eventos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Remove todos os eventos"),
+            @ApiResponse(code = 500, message = "Foi gerada uma exceção")
+    })
     @DeleteMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteAllEvents() {

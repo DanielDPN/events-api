@@ -11,6 +11,7 @@ import com.events.api.repository.RoleRepository;
 import com.events.api.repository.UserRepository;
 import com.events.api.security.jwt.JwtUtils;
 import com.events.api.security.services.UserDetailsImpl;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,6 +52,7 @@ public class AuthController {
         this.jwtUtils = jwtUtils;
     }
 
+    @ApiOperation(value = "Retorna o token de acesso do usuário credenciado")
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody Login login) {
 
@@ -72,6 +74,7 @@ public class AuthController {
                 roles));
     }
 
+    @ApiOperation(value = "Retorna o novo usuário registrado")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody Signup signUp) {
         if (userRepository.existsByUsername(signUp.getUsername())) {
