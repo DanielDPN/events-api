@@ -25,16 +25,6 @@ public class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void it_should_return_ok_created_user() throws Exception {
-        Signup signup = new Signup("martha", "martha@gmail.com", "13246578");
-
-        mockMvc.perform(post("/api/auth/signup")
-                .content(objectMapper.writeValueAsString(signup))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void it_should_return_token_login() throws Exception {
         Login login = new Login("martha", "13246578");
 
